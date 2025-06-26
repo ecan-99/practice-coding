@@ -460,13 +460,3 @@ def 복권() :
 
 # deposit(balance , 2000)
 # print(balance)
-
-
-
-
-
-
-
-
-
-

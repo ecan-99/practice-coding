@@ -1,0 +1,910 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "99f096c5",
+   "metadata": {},
+   "source": [
+    "## 데이터 분석\n",
+    "- 정의:데이터를 수집하고, 정리,가공한 후에 패턴, 인사이트,의미를 발견하여 의사결정에 활용하는 과정\n",
+    "- 목적: 데이터에서 유용한 정보를 뽑아내는 것\n",
+    "\n",
+    "\n",
+    "### 전처리의 중요성 = 데이터 분석을 시작하기 위한 청소 작업\n",
+    "1. 결측치 처리: 값이 비어있는데이터\n",
+    "2. 이상치: 너무 크거나 작은 값 \n",
+    "3. 데이터 형식: 날짜/문자열을 숫자형 변환\n",
+    "4. 스케일링/정규화: 값의 범위 맞추기\n",
+    "5. 중복 제거\n",
+    "6. 인코딩: 데이터를 숫자로 변환\n",
+    "\n",
+    "\n",
+    "### 피처(Feature): 데이터의 특성을 설명하는 변수(열,column)을 의미\n",
+    "    분석 대상(행,row)의 속성을 나타내는 정보  \n",
+    "    전처리 단계 피처 작업  \n",
+    "        - 불필요한 피처 제거  \n",
+    "        - 결축치 처리  \n",
+    "        - 스케일링 / 정규화  \n",
+    "        - 인코딩  \n",
+    "        - 피처 엔지니어링"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3fff8b57",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2.3.2\n"
+     ]
+    }
+   ],
+   "source": [
+    "# pip install pands로 판다스 설치 가능\n",
+    "import pandas as pd\n",
+    "\n",
+    "print(pd.__version__)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1eff1056",
+   "metadata": {},
+   "source": [
+    "## 판다스의 기본 구조\n",
+    "### 1. Series\n",
+    "    - 1차원 형태 = 일반적으로 리스트 형태 (자동으로 인덱스가 붙음)  \n",
+    "    - `pd.Series()` 생성자 = 리스트, 넘파이 배열, 딕셔니리 등으로 Series 생성 가능  \n",
+    "    - 인덱스 지정: Series 생성 시 인덱스를 원하는 값으로 지정 가능 / 지정하지 않을 시 자동으로 넘버링 \n",
+    "    (예시1)  \n",
+    "        - `.values` = 값들의 배열(numpy ndarray) 확인,   \n",
+    "        - `.index` = 인덱스 객체 확인  \n",
+    "        (예시 2)\n",
+    "\n",
+    "### 2. DataFrame\n",
+    "    - 2차원 형태 = 표 형태(행과 열로 구성)  \n",
+    "    - 엑셀 시트나 SQL 테이블과 비슷한 구조\n",
+    "    - 생성 : 딕셔너리로 생성하는 것이 가장 간단   \n",
+    "        (예시3)\n",
+    "    \n",
+    "        - `.columns`: 칼럼의 이름들을 확인  \n",
+    "        - `.index`: 행 인덱스 확인 가능   \n",
+    "        - `.values`: 각 행의 값들 확인  \n",
+    "            (예시4)\n",
+    "\n",
+    "    - DataFrame 조회와 기본 정보  \n",
+    "        - `.head()`: 기본적으로 5개의 행만 뜸. n개의 행 갯수를 보고 싶으면 ()안에 n을 넣으면 됨.  \n",
+    "        - `.tail()`: 끝 부분의 행을 표시. head의 끝부분에서 보는 형태  \n",
+    "        - `.shape`: 데이터 프레임의 크기 (행,열의 개수)  \n",
+    "        - `.info()`: 각 컬럼 타입, null 개수 등 정보 출력  \n",
+    "        - `.describe()`: 수치형 컬럼들의 통계 요약. count, mean, std, 퍼센트 등\n",
+    "\n",
+    "### 3. 차이점\n",
+    "    Series는 피처가 1개, DataFrame은 1개 이상 \n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "32630e79",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "국어    90\n",
+       "영어    80\n",
+       "수학    85\n",
+       "과학    95\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 172,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#예시1\n",
+    "scores = pd.Series([90,80,85,95])\n",
+    "subjects = pd.Series([90,80,85,95], index = ['국어', '영어', '수학', '과학'])\n",
+    "\n",
+    "#예시2\n",
+    "subjects['영어'] # np.int64\n",
+    "subjects.values # array([90, 80, 85, 95])\n",
+    "subjects.index  # Index(['국어', '영어', '수학', '과학'], dtype='object')\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 261,
+   "id": "b1fdbff4",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "        이름  나이           도시\n",
+      "0    Alice  25     New York\n",
+      "1      Bob  30  Los Angeles\n",
+      "2  Charlie  35      Chicago\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "array([['Alice', 25, 'New York'],\n",
+       "       ['Bob', 30, 'Los Angeles'],\n",
+       "       ['Charlie', 35, 'Chicago']], dtype=object)"
+      ]
+     },
+     "execution_count": 261,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#예시3\n",
+    "data = {\n",
+    "    '이름': ['Alice', 'Bob', 'Charlie'],\n",
+    "    '나이': [25, 30, 35],\n",
+    "    '도시': ['New York', 'Los Angeles', 'Chicago']\n",
+    "}\n",
+    "\n",
+    "df = pd.DataFrame(data) # 데이터 프레임 생성\n",
+    "# print(df)는 단순 문자열 출력 / df는 jupiter notebook 환경에서 pandas가 만든 테이블 형식으로 출력\n",
+    "print(df)\n",
+    "df\n",
+    "\n",
+    "#예시4\n",
+    "df.columns # Index(['이름', '나이', '도시'], dtype='object')\n",
+    "df.index # RangeIndex(start=0, stop=3, step=1)\n",
+    "df.values  # array([['Alice', 25, 'New York'], ['Bob', 30, 'Los Angeles'], ['Charlie', 35, 'Chicago']], dtype=object)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "11195a89",
+   "metadata": {},
+   "source": [
+    "## 판다스 주요 데이터 타입\n",
+    "### 1. 수치형  \n",
+    "    - `int`: 정수형  \n",
+    "    - `float`: 실수형\n",
+    "\n",
+    "### 2. 문자형/범주형\n",
+    "    - `object`: 문자열 or 혼합된 데이터 \n",
+    "    - `string`: 전용 문자열 타입  \n",
+    "    - `category`: 범주형 데이터 (메모리 절약 & 연산 속도 향상). 순서(ordered = True)를 지어하면 크기 비교 가능\n",
+    "\n",
+    "### 3. 불리언 (boolean type)\n",
+    "    - `True`/ `False` 지정  \n",
+    "    - 최근엔 boolean (nullable) 타입도 있음 = 결측치(NaN과 함께 사용 가능)\n",
+    "\n",
+    "### 4. 날짜/ 시간\n",
+    "    - `datetime64`[ns]: 날짜/시간 데이터  \n",
+    "    - `timedelta`[ns]: 두 시점 사이의 차이(시간 간격)  \n",
+    "    - `period`: 일정한 기간\n",
+    "\n",
+    "\n",
+    "### 5. 결축치/특수값\n",
+    "    - `NaN`: Not a Number\n",
+    "    - `NaT`: Not a Time\n",
+    "    - `None`: object컬럼에서 보통 NaN처럼 처리\n",
+    "\n",
+    "\n",
+    "### 6. 데이터 타입 확인 & 변환  \n",
+    "    - 확인: `df.dtypes`, `df.info()`  \n",
+    "    - 변환: `astype()` 메서드 활용  \n",
+    "    (예시5)\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b6ae2c57",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "CategoricalDtype(categories=['Alice', 'Bob', 'Charlie'], ordered=False, categories_dtype=object)"
+      ]
+     },
+     "execution_count": 199,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#예시5\n",
+    "df['이름'].dtypes # 문자형은'O' = object\n",
+    "df['나이'].dtypes # 숫자형은 int64로 뜸\n",
+    "\n",
+    "df['이름'] = df['이름'].astype('category') # 데이터 타입 변환 가능. 재지정해줘야 원본이 바뀜\n",
+    "df['이름'].dtypes # CategoricalDtype(categories=['Alice', 'Bob', 'Charlie'], ordered=False, categories_dtype=object)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "42fd7b97",
+   "metadata": {},
+   "source": [
+    "## 데이터 불러오기 및 저장 (csv,excel, json)\n",
+    "\n",
+    "### 1. csv,excel,json 읽기\n",
+    "- `pd.read_csv('파일경로')` \n",
+    "    - 구분자가 콤마가 아닌 경우 `sep =` 으로 인자를 지정할 수 있음 raw 데이터를 확인해서 구분자가 명확하지 않으면 이상한 테이블이 생성 됨\n",
+    "    - 헤더가 없는 파일은 `header = None`으로 읽은 뒤 컬럼 이름 지정 가능\n",
+    "        - 헤더: 데이터의 각 열(column)이 어떤 종류의 데이터를 담고 있는지 설명하는 첫 번째 행의 레이블(이름)\n",
+    "    - 한글이 포함 된 csv의 경우 `encoding='utf-8'` 혹은 필요한 인코딩(e.g. 'cp949')을 지정\n",
+    "        - cp949 : 한국어 Windows에서 사용하는 기본적인 문자 인코딩 방식\n",
+    "    - `parse_dates=['Order Date']` : 'Order Date'라는 이름의 열에 있는 문자열 데이터를 자동으로 날짜/시간(datetime) 형식으로 파싱하여 변환\n",
+    "        - 파싱: 주어진 데이터를 특정 언어의 문법에 따라 분석하고 구조화된 정보로 변환하는 과정\n",
+    "- `pd.read_excel('파일경로', sheet_name=0)`: sheet_name을 지정해주지 않으면 첫번째 시트만 불러 옴\n",
+    "    - `sheet_name`는 파라미터로 시트 이름이나 번호를 지정하여 특정 시트만 불러올 수 있음\n",
+    "    -  Excel 파일로부터 읽을 때 판다스는 내부적으로 openpyxl 등의 모듈을 사용하므로, 환경에 따라 해당 패키지가 설치되어 있어야 함\n",
+    "        - pip로 설치한 경우 pip install openpyxl 등으로 추가 설치해야 함\n",
+    "- `pd.read_json('파일경로')` \n",
+    "    - JSON은 웹에서 데이터를 주고받을 때 많이 쓰이는 구조화된 문자열 형식  \n",
+    "    (예시6)\n",
+    "  \n",
+    "  \n",
+    "### 2. csv,excel,json 쓰기\n",
+    "- `DataFrame.to_csv('파일경로', index=False)`:   \n",
+    "    - `index=False`로 지정하면 행 인덱스 저장 X, 데이터만 저장(행 번호는 의미 없는 경우가 많음)\n",
+    "- `DataFrame.to_excel('파일경로', index=False)`:   \n",
+    "    - `index=False`로 지정하면 행 인덱스 저장 X, 데이터만 저장(행 번호는 의미 없는 경우가 많음) \n",
+    "    - 엑셀은 여러 시트를 가질 수 있는데, 판다스는 기본적으로 첫 번째 시트에 저장,  \n",
+    "     여러 시트를 저장하는 경우 `ExcelWriter` 객체를 사용 `df.to_excel(writer, sheet_name='Sheet1')`형태 로 저장\n",
+    "- `DataFrame.to_json('파일경로', orient='records')`:  \n",
+    "    - `orient='records'`: 데이터의 한 행에 대한 정보를 묶어서 하나의 JSON 객체로 표현\n",
+    "    - `orient='columns'`(디폴트 값):  각 열(헤더)이 최상위 키가 되고, 그 아래에는 인덱스를 키로 하고 해당 열의 데이터를 값으로 가지는 객체가 포함  \n",
+    "    (예시7)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "bc9fc034",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#예시6\n",
+    "orders = pd.read_csv('superstore_orders.csv')\n",
+    "# orders = pd.read_excel('superstore_orders.excel', sheet_name = 0)\n",
+    "# orders = pd.read_excel('Superstore.xlsx', sheet_name='Orders') # print(orders.shape) => (9994, 21)\n",
+    "# orders = pd.read_json('superstore_orders.json')\n",
+    "\n",
+    "#예시7\n",
+    "df_sample = pd.DataFrame({'X': [1,2], 'Y': [3,4]}) #샘플 데이터 생성\n",
+    "df_sample.to_csv(\"sample.csv\", index = False) # scv로 저장\n",
+    "df_sample.to_excel(\"sample.xlsx\", index = False) #엑셀로 저장\n",
+    "df_sample_orders = orders.head(100).to_excel('orders_sample.xlsx', index=False) # 여러 시트 저장 (상위 100개의 행을 엑셀 파일로 저장)\n",
+    "df_sample.to_json(\"sample.json\") #json으로 저장\n",
+    "df_sample.to_json('sample1.json', orient = 'columns') # {\"X\":{\"0\":1,\"1\":2},\"Y\":{\"0\":3,\"1\":4}}\n",
+    "df_sample.to_json(\"sample.json\", orient = 'records') # [{\"X\":1,\"Y\":3},{\"X\":2,\"Y\":4}]\n",
+    "\n",
+    "sample = pd.read_json()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "13c8db78",
+   "metadata": {},
+   "source": [
+    "## 데이터 인덱싱, 슬라이싱\n",
+    "\n",
+    "### 1. 라벨 기반 인덱싱- `.loc[행인덱스, 열이름]`\n",
+    "- `.loc[1:3]`는 끝 점 '3'을 포함하여 행을 가져옴\n",
+    "- `.loc[2]`는 한 행이 Series 형태로 반환\n",
+    "- `.loc[2, 'val']` = 인덱스 2의 행의 'val'값 반환,  \n",
+    "     `.loc[[2,3], 'val']` = 인덱스 2,3의 행의 'val'값 반환,  \n",
+    "    `.loc[[2,3], ['val','val1']]` = 인덱스 2, 3 의 val, val1을 반환   \n",
+    "- 불리언 조건도 사용 가능\n",
+    "    -`.loc`에 행 조건을 전달해 해당 조건을 만족하는 행 추출 가능  \n",
+    "\n",
+    "### 2. 정수 위치기반 인덱싱 - `.iloc[행번호,열번호]`\n",
+    "- 문자열로 확인 불가, 끝 번호는 포함하지 않음\n",
+    "- `.iloc[0:3]` = 0,1,2의 행을 가져옴    \n",
+    "    (예시8)\n",
+    "\n",
+    "\n",
+    "### 3. loc과 iloc의 차이점\n",
+    "- `.loc`는 라벨 범위의 끝을 포함하고 `.iloc`는 끝 인덱스 번호를 제외\n",
+    "\n",
+    "### 4. 열 선택과 슬라이싱\n",
+    "- 특정 열(시리즈)를 선택하는 방법은 `df['컬럼명']` 표기 = 컬럼명의 컬럼을 추출하여 Series로 반환 \n",
+    "- 행을 범위로 슬라이싱할 때 .loc과 .iloc를 모두 사용 가능 \n",
+    "- 인덱스 라벨이 순서형이라면 `df.loc[ 시작라벨 : 끝라벨 ]` 형태로 가능,  \n",
+    "but 행은 `.iloc`로 번호 기반 슬라이싱을, 열은 이름으로 지정하는 혼합 형태를 쓰기도 함.\n",
+    "- `value_counts()` 를 통해 특정 컬럼의 값 분포를 확인 `df[특정 컬럼].value_counts()`  \n",
+    "    (예시9)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "30d65b57",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>val</th>\n",
+       "      <th>val1</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>10</td>\n",
+       "      <td>100</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>20</td>\n",
+       "      <td>200</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   val  val1\n",
+       "0   10   100\n",
+       "1   20   200"
+      ]
+     },
+     "execution_count": 262,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#예시8\n",
+    "df = pd.DataFrame({'val': [10, 20, 30, 40], 'val1': [100, 200, 300, 400]}) #, index=['a','b','c','d'])\n",
+    "df.loc[2, 'val'] # np.int64(30)\n",
+    "df.loc[[0, 2], 'val'] \n",
+    "''' 출력\n",
+    "0    10\n",
+    "2    30\n",
+    "Name: val, dtype: int64\n",
+    "'''\n",
+    "df1 = df.loc[df['val1'] > 200]\n",
+    "''' df1 출력\n",
+    "\tval\tval1\n",
+    "2\t30\t300\n",
+    "3\t40\t400\n",
+    "'''\n",
+    "df.iloc[0:2]\n",
+    "''' 출력\t\n",
+    "val\tval1\n",
+    "0\t10\t100\n",
+    "1\t20\t200\n",
+    "'''\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "cca76bb1",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>val</th>\n",
+       "      <th>test</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>a</th>\n",
+       "      <td>10</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b</th>\n",
+       "      <td>20</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   val  test\n",
+       "a   10     1\n",
+       "b   20     2"
+      ]
+     },
+     "execution_count": 268,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#예시9\n",
+    "df.loc[2] # val  30 \\n Name: 2, dtype: int64\n",
+    "df = pd.DataFrame({'val': [10, 20, 30, 40], 'test': [1,2,3,4]}, index=['a','b','c','d'])\n",
+    "df.loc['a':'c'] # = df.loc['a':'c', :]\n",
+    "df.iloc[0:2] #0, 1행 출력\n",
+    "df['val'] # val열 출력\n",
+    "df['test'] # test열 출력\n",
+    "df[['val','test']] # val, test열 출력\n",
+    "orders['Ship Mode'].value_counts()\n",
+    "'''출력\n",
+    "Ship Mode\n",
+    "Standard Class    5859\n",
+    "Second Class      1902\n",
+    "First Class       1501\n",
+    "Same Day           538\n",
+    "Name: count, dtype: int64\n",
+    "'''\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1d24a555",
+   "metadata": {},
+   "source": [
+    "### 조건 필터링\n",
+    "\n",
+    "1. 단일 조건으로 필터링\n",
+    "2. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 97,
+   "id": "9e4c702b",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "   total_bill   tip     sex smoker  day    time  size\n",
+      "0       16.99  1.01  Female     No  Sun  Dinner     2\n",
+      "1       10.34  1.66    Male     No  Sun  Dinner     3\n",
+      "2       21.01  3.50    Male     No  Sun  Dinner     3\n",
+      "3       23.68  3.31    Male     No  Sun  Dinner     2\n",
+      "4       24.59  3.61  Female     No  Sun  Dinner     4\n"
+     ]
+    }
+   ],
+   "source": [
+    "import seaborn as sns\n",
+    "\n",
+    "tips = sns.load_dataset('tips')\n",
+    "print(tips.head(5))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "fd571b1d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "high_tip = tips[tips['tip'] > 5] # 새로운 변수에 담아줘야 조건이 필러팅 된 값 출력 가능 "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 107,
+   "id": "fc0fd1d1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# tips['tip']\n",
+    "# 조건 추가 tips['tip'] >5\n",
+    "# true인 데이터만 보고 싶으면 tips[tips['tip'] >5]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 112,
+   "id": "5c6b5c92",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>total_bill</th>\n",
+       "      <th>tip</th>\n",
+       "      <th>day</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>23</th>\n",
+       "      <td>39.42</td>\n",
+       "      <td>7.58</td>\n",
+       "      <td>Sat</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>44</th>\n",
+       "      <td>30.40</td>\n",
+       "      <td>5.60</td>\n",
+       "      <td>Sun</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>47</th>\n",
+       "      <td>32.40</td>\n",
+       "      <td>6.00</td>\n",
+       "      <td>Sun</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>52</th>\n",
+       "      <td>34.81</td>\n",
+       "      <td>5.20</td>\n",
+       "      <td>Sun</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>59</th>\n",
+       "      <td>48.27</td>\n",
+       "      <td>6.73</td>\n",
+       "      <td>Sat</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    total_bill   tip  day\n",
+       "23       39.42  7.58  Sat\n",
+       "44       30.40  5.60  Sun\n",
+       "47       32.40  6.00  Sun\n",
+       "52       34.81  5.20  Sun\n",
+       "59       48.27  6.73  Sat"
+      ]
+     },
+     "execution_count": 112,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "high_tip[['total_bill', 'tip', 'day']].head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "49498803",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# & = and\n",
+    "# | = or\n",
+    "# ~ = not\n",
+    "\n",
+    "cond = (tips['day'] == 'Sun') & (tips['tip'] > 5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 117,
+   "id": "c42ae98d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "double_cond_tips = tips[cond]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "00541e11",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "nan"
+      ]
+     },
+     "execution_count": 120,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "double_cond_tips['total_bill'].mean()\n",
+    "double_cond_tips['total_bill'].sum()\n",
+    "double_cond_tips['total_bill'].max()\n",
+    "double_cond_tips['total_bill'].min()\n",
+    "double_cond_tips['total_bill'].median()\n",
+    "double_cond_tips['total_bill'].count()  "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "64e0547a",
+   "metadata": {},
+   "source": [
+    "## 데이터 정렬 및 정제\n",
+    "\n",
+    "### 1. 데이터 정렬\n",
+    "- `sort_values()`: 하나 이상의 컬럼 값을 기준으로 행을 정렬.   \n",
+    "    - 오름차순(ascending=True)  \n",
+    "    - 내림차순 (ascending=False)  \n",
+    "    - `by` 파라미터에 컬럼명을 지정하여 정렬 기준 컬럼을 설정 (Series에는 by 없이 자기 자신의 값 기준으로 정렬)  \n",
+    "        (예시10)\n",
+    "- `sort_index()`: 행 인덱스 라벨을 기준으로 정렬\n",
+    "    - 중간행을 삭제하면 인덱스는 당겨지는 것이 아니라 그대로이기 떄문에 index를 재정렬을 하기 위해 사용\n",
+    "    - 오름차순(ascending=True)  \n",
+    "    - 내림차순 (ascending=False)    \n",
+    "        (예시10)\n",
+    "\n",
+    "### 2. 데이터 정제\n",
+    "- 컬럼명 정리(`DataFrame.rename()`)  \n",
+    "    - replace랑 비슷함, 쉼표로 여러개 변경도 가능,   \n",
+    "    *꼭 새로운 변수로 지정할 것  \n",
+    "    - `orders.columns = [col.lower() for col in orders.columns]` 식으로 컬럼명을 전부 소문자로 바꾸는 식의 처리도 할 수 있습니다\n",
+    "- 불필요한 컬럼 제거(`DataFrame.drop()`)  \n",
+    "    - 데이터 값 처리\n",
+    "    - 컬럼을 제거할 때는 axis=1 또는 columns= 파라미터를 사용  \n",
+    "        - 해당 열만 바꾸기 위해서는 해당열만 선택해서 바꿔야함. 새로운 변수에 적용 X\n",
+    "        - place=True 옵션을 쓰면 바로 자기 자신에서 제거\n",
+    "- 데이터 값 정리\n",
+    "    - `Series.str.strip()`: 좌우 공백 제거\n",
+    "    - `Series.str.lower()` or `upper()`: 대소문자 섞인 값을 통일에 이용\n",
+    "    - `.str.title()`:  첫 문자만 대문자로 표기\n",
+    "    - `.unique()`: 중복된 값을 제거하고 고유한 값을 보여줌  \n",
+    "        (예시11)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "7539b4db",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "     total_bill    tip  size\n",
+      "170       50.81  10.00     3\n",
+      "212       48.33   9.00     4\n",
+      "23        39.42   7.58     4\n",
+      "59        48.27   6.73     4\n",
+      "141       34.30   6.70     6\n"
+     ]
+    }
+   ],
+   "source": [
+    "#예시 10\n",
+    "sorted_tips = tips.sort_values(by='tip', ascending=[False, True]) # 스페이스도 문자열로 보기 때문에 입력 시 조심\n",
+    "tips.sort_values(by=['day','tip']) # 동일한 팁 금액에서는 다른 컬럼을 기준으로 정렬 - 요일별로 묶은 뒤 그 안에서 tip순으로 정렬\n",
+    "print(sorted_tips[['total_bill','tip','size']].head(5)) # 팁(tip)이 가장 큰 상위 5건\n",
+    "orders.columns = [col.lower() for col in orders.columns] 식으로 컬럼명을 전부 소문자로 바꾸는 식의 처리도 할 수 있습니다"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ac09090a",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array(['New York', 'Los Angeles', 'Chicago'], dtype=object)"
+      ]
+     },
+     "execution_count": 274,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#예시 11\n",
+    "orders=orders.rename(columns={'Order Date': 'Order_Date'}) #Superstore 데이터의 컬럼 'Order Date'를 'Order_Date'\n",
+    "orders.drop(columns=['Row ID'], inplace=True)\n",
+    "cities = pd.Series([' new york', 'Los Angeles ', 'Chicago', ' new york'])\n",
+    "cleaned = cities.str.strip().str.title()\n",
+    "cleaned.unique()\n",
+    "orders['Ship Mode'].unique()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "85f28d9d",
+   "metadata": {},
+   "source": [
+    "## 결측치 처리\n",
+    "\n",
+    "## 1. 결측치 확인  \n",
+    "- `.isnull()` or `.notnull()`: 값이 결측치인지 아닌지 True/False로 나타남\n",
+    "\n",
+    "## 2. 결측치 개수 파악   \n",
+    "- `.isnull().sum()`: 컬럼별 결측치 개수 확인  \n",
+    "    `.info()`를 통해서 간접적으로 결측치 확인 가능 \n",
+    "\n",
+    "## 3. 결측치 삭제\n",
+    "- `.dropna()`: 결측치가 있는 열 또는 행 삭제 (drop하는데 na값을 drop)  \n",
+    "- `.dropna(subset=['컬럼명1', '컬럼명2'], inplace=False)`\n",
+    "- `df.dropna(axis=1)`: 결측치가 있는 컬럼을 제거\n",
+    "\n",
+    "## 4. 결측치 대체  \n",
+    "- 고정값 대체: `.fillna(0)`: 0으로 결측치를 채움.  \n",
+    "    `df.fillna({'age': df['age'].mean(), 'city': 'Unknown'})`: age열에는 age의 평균을 city열에는 unknown값을 각각 채우는 형태\n",
+    "- 통계값으로 대체: 수치형 데이터는 평균이나 중앙값으로 결측치를 채우고, 범주형 데이터는 최빈값 또는 'Unknown'으로 채우는 경우가 많음 \n",
+    "- `inplace`: `inplace=True`를 매개변수로 받으면 `df[''] = df[''].fillna()`형태로 새로운 객체를 받지 않아도 됨.  \n",
+    "        (예시12)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0f13fbda",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#예시 12\n",
+    "import numpy as np\n",
+    "\n",
+    "df_miss = pd.DataFrame({\n",
+    "    'name': ['Alice', 'Bob', 'Charlie'],\n",
+    "    'age': [25, np.nan, 30],\n",
+    "    'city': ['New York', 'Los Angeles', np.nan]\n",
+    "})\n",
+    "print(df_miss)\n",
+    "\n",
+    "\n",
+    "df_miss.isnull() # notnull보다 일반적으로 더 많이 사용\n",
+    "df_miss.notnull()\n",
+    "df_miss.isnull().sum() # null 갯수 확인\n",
+    "df_miss.info() # total에서 총 개수 확인하고 아래에서 몇개가 차있는지 확인가능\n",
+    "df_miss.dropna() # 원본 바뀌지 않음 = inplace 있음\n",
+    "df_miss.dropna(subset = ['age'])\n",
+    "df_miss.dropna(axis = 1) # 결측치 있는 컬럼 삭제\n",
+    "df_filled = df_miss.copy()\n",
+    "df_filled['age'].fillna(df_filled['age'].mean(), inplace=True)\n",
+    "df_filled['city'].fillna('Unknown', inplace=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3429fe09",
+   "metadata": {},
+   "source": [
+    "## 중복 제거\n",
+    "\n",
+    "### 1. 중복 행 확인  \n",
+    "- `.duplicated()`:각 행이 이전에 나타난 적이 있는지 여부를 True/False로 표시한 불리언 Series를 반환\n",
+    "- `.duplicated(keep='x')`: x에는 first,last,false가 입력 가능 각 첫번째 데이터만 false, 마지막 데이터만 false, 모든 중복데이터를 true로 표시\n",
+    "\n",
+    "### 2. 중복 행 삭제  \n",
+    "- `.drop_duplicates()`: 처음 행만 남기고 중복 행 제거, 인덱스는 기존 순서를 유지(인덱스 재정렬 x)\n",
+    "- `inplace=True`를 이용하여 원본 변경\n",
+    "- `subset=['컬럼명']`매개변수를 넣으면 해당 컬럼의 값이 같은 행 하나만 남고 제거\n",
+    "- `keep='first'|'last'| False` 매개변수로 어떤 데이터 값을 남길지 결정 가능 (false는 중복값 전부 제거)    \n",
+    "        (예시13)\n",
+    "- 새로운 컬럼을 넣을 떄는 딕셔너리와 같은 방식으로 가능  \n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d1e61ae1",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "('Duplicates:\\n',\n",
+       " 0    False\n",
+       " 1     True\n",
+       " 2    False\n",
+       " 3    False\n",
+       " dtype: bool)"
+      ]
+     },
+     "execution_count": 277,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# 예시 13\n",
+    "df_dup = pd.DataFrame({'A': [1, 1, 2, 3], 'B': [5, 5, 6, 7]})\n",
+    "\"Duplicates:\\n\", df_dup.duplicated() # df_dup.duplicated() \n",
+    "df_dup.drop_duplicates(keep = 'first')\n",
+    "df_dup.drop_duplicates(keep = 'last')\n",
+    "df_dup.drop_duplicates(keep = False) # 충복값 모두 제거\n",
+    "orders.drop_duplicates(subset = ['Order ID', 'Product ID']) "
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.11"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
